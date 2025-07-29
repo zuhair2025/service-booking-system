@@ -9,7 +9,12 @@ class BookingService
 {
     public function getAllBookings()
     {
-        return Booking::where('status','active')->get();
+        if(Auth::user()->role === 'admin')
+            $bookings = Booking::all();
+        else
+            $bookings = Booking::where('user_id',auth()->user()->id)->get();
+        
+        return $bookings;
     }
 
     public function store(array $data)
