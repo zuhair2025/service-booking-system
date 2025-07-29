@@ -7,7 +7,9 @@ use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
 use App\Services\ServiceManager;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ServiceController extends Controller
 {
@@ -27,6 +29,13 @@ class ServiceController extends Controller
 
     public function store(ServiceRequest $request)
     {
+        if ($request->user()->cannot('create', Service::class)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not allowed to this page.'
+            ]);
+        }
+
         $data = $request->validated();
 
         $service = $this->serviceManager->store($data);
@@ -40,6 +49,13 @@ class ServiceController extends Controller
 
     public function update(UpdateServiceRequest $request, Service $service)
     {
+        if ($request->user()->cannot('update', $service)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not allowed to this page.'
+            ]);
+        }
+
         $data = $request->validated();
 
         $service = $this->serviceManager->update($service,$data);
@@ -53,11 +69,20 @@ class ServiceController extends Controller
 
     public function destroy(Service $service)
     {
+        if (auth()->user()->cannot('delete', $service)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not allowed',
+            ], 403);
+        }
+
+
         $this->serviceManager->delete($service);
 
         return response()->json([
             'success' => true,
             'message' => 'Service deleted successfully',
         ],200);
+
     }
 }
