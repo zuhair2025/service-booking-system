@@ -20,5 +20,12 @@ class UserTableSeeder extends Seeder
             'password' => Hash::make('password'), // use bcrypt
             'role' => 'admin',
         ]);
+
+        User::create([
+            'name' => 'zuhair',
+            'email' => 'zuhair@example.com',
+            'password' => Hash::make('password'), // use bcrypt
+            'role' => 'customer',
+        ]);
     }
 }
